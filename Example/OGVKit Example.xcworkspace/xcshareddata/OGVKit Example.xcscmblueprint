@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "415D255699FFD676ACD1E1922C4429A1A0B8CD7C",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "415D255699FFD676ACD1E1922C4429A1A0B8CD7C" : 9223372036854775807,
+    "1F99E83117EF968A740270460CBCDBFD997622E4" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "F12E2933-5D13-4216-ACC1-53130C68E6C1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "415D255699FFD676ACD1E1922C4429A1A0B8CD7C" : "OGVKit\/",
+    "1F99E83117EF968A740270460CBCDBFD997622E4" : "OGVKit\/libskeleton\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "OGVKit Example",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Example\/OGVKit Example.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/brion\/libskeleton.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1F99E83117EF968A740270460CBCDBFD997622E4"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/sakamoto-ga\/OGVKit.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "415D255699FFD676ACD1E1922C4429A1A0B8CD7C"
+    }
+  ]
+}
