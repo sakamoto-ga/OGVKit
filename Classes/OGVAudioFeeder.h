@@ -70,4 +70,9 @@
  */
 -(BOOL)isClosed;
 
+/**
+ * Should change category of AVAudioSession? Default YES
+ */
+@property BOOL shouldChangeAudioSessionCategory;
+
 @end

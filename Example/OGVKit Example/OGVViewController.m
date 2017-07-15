@@ -6,6 +6,7 @@
 //  Copyright (c) 2014-2015 Brion Vibber. All rights reserved.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import "OGVViewController.h"
 
 #import "OGVExampleItem.h"
@@ -129,6 +130,13 @@
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"generic"];
     
     self.player.delegate = self;
+    // No sound
+    // self.player.soundMode = OGVPlayerSoundModeNone;
+    
+    // Respect mute mode
+    self.player.soundMode = OGVPlayerSoundModeAuto;
+    NSError *error = nil;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:&error];
 
     format = @"webm";
     resolution = 360;

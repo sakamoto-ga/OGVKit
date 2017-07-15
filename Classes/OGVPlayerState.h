@@ -7,6 +7,12 @@
 //
 //
 
+typedef NS_ENUM(NSInteger, OGVPlayerSoundMode) {
+    OGVPlayerSoundModeNone = 0, // No sounds, don't output sounds.
+    OGVPlayerSoundModeAuto = 1, // Output sounds but doen't change AVAudioSession.category
+    OGVPlayerSoundModePlayback = 2  // Change the AVAudioSession.category and always enable playback.
+};
+
 @class OGVPlayerState;
 
 
@@ -49,7 +55,17 @@
                           delegate:(id<OGVPlayerStateDelegate>)delegate
                      delegateQueue:(dispatch_queue_t)delegateQueue;
 
--(instancetype)initWithURL:(NSURL *)URL delegate:(id<OGVPlayerStateDelegate>)delegate;
+-(instancetype)initWithInputStream:(OGVInputStream *)inputStream
+                          delegate:(id<OGVPlayerStateDelegate>)delegate
+                     delegateQueue:(dispatch_queue_t)delegateQueue
+                         soundMode:(OGVPlayerSoundMode)soundMode;
+
+-(instancetype)initWithURL:(NSURL *)URL
+                  delegate:(id<OGVPlayerStateDelegate>)delegate;
+
+-(instancetype)initWithURL:(NSURL *)URL
+                  delegate:(id<OGVPlayerStateDelegate>)delegate
+                 soundMode:(OGVPlayerSoundMode)soundMode;
 
 -(void)play;
 -(void)pause;

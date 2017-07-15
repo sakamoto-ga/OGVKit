@@ -56,6 +56,7 @@
 
 @property (nonatomic) NSURL *sourceURL;
 @property (nonatomic) OGVInputStream *inputStream;
+@property (nonatomic) OGVPlayerSoundMode soundMode;
 
 @property (readonly) BOOL paused;
 @property (readonly) float playbackPosition;

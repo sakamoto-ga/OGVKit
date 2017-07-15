@@ -88,6 +88,7 @@ static void OGVAudioFeederPropListener(void *data, AudioQueueRef queue, AudioQue
     BOOL isClosing;
     BOOL isClosed;
     BOOL shouldClose;
+    BOOL _shouldChangeAudioSessionCategory;
 }
 
 -(id)initWithFormat:(OGVAudioFormat *)format
@@ -102,6 +103,7 @@ static void OGVAudioFeederPropListener(void *data, AudioQueueRef queue, AudioQue
         isClosing = NO;
         isClosed = NO;
         shouldClose = NO;
+        _shouldChangeAudioSessionCategory = YES;
 
         samplesQueued = 0;
         samplesPlayed = 0;
@@ -334,7 +336,9 @@ static void OGVAudioFeederPropListener(void *data, AudioQueueRef queue, AudioQue
 
         isStarting = YES;
         
-        [self changeAudioSessionCategory];
+        if (_shouldChangeAudioSessionCategory) {
+            [self changeAudioSessionCategory];
+        }
         
         // Prime the buffers!
         for (int i = 0; i < nBuffers; i++) {
@@ -398,5 +402,16 @@ static void OGVAudioFeederPropListener(void *data, AudioQueueRef queue, AudioQue
         }
     }
 }
-
+-(BOOL)shouldChangeAudioSessionCategory
+{
+    @synchronized (timeLock) {
+        return _shouldChangeAudioSessionCategory;
+    }
+}
+-(void)setShouldChangeAudioSessionCategory:(BOOL)shouldChangeAudioSessionCategory
+{
+    @synchronized (timeLock) {
+        _shouldChangeAudioSessionCategory = shouldChangeAudioSessionCategory;
+    }
+}
 @end

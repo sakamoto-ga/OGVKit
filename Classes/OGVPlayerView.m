@@ -60,6 +60,8 @@ static BOOL OGVPlayerViewDidRegisterIconFont = NO;
 #else
     OGVFrameView *frameView;
 #endif
+
+    OGVPlayerSoundMode _soundMode;
 }
 
 #pragma mark - Public methods
@@ -114,7 +116,8 @@ static BOOL OGVPlayerViewDidRegisterIconFont = NO;
     if (_inputStream) {
         state = [[OGVPlayerState alloc] initWithInputStream:_inputStream
                                                    delegate:self
-                                              delegateQueue:NULL];
+                                              delegateQueue:NULL
+                                                  soundMode:_soundMode];
     }
 }
 
@@ -187,6 +190,7 @@ static BOOL OGVPlayerViewDidRegisterIconFont = NO;
         CTFontManagerRegisterFontsForURL((__bridge CFURLRef)fontURL, kCTFontManagerScopeProcess, nil);
         OGVPlayerViewDidRegisterIconFont = YES;
     }
+    _soundMode = OGVPlayerSoundModePlayback;
     
     // Output layer
 #ifdef USE_LAYER
@@ -437,6 +441,14 @@ static BOOL OGVPlayerViewDidRegisterIconFont = NO;
     int min = rounded / 60;
     int sec = abs(rounded % 60);
     return [NSString stringWithFormat:@"%d:%02d", min, sec];
+}
+-(OGVPlayerSoundMode)soundMode
+{
+    return _soundMode;
+}
+-(void)setSoundMode:(OGVPlayerSoundMode)soundMode
+{
+    _soundMode = soundMode;
 }
 
 #pragma mark - OGVPlayerStateDelegate methods

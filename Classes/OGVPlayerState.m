@@ -37,6 +37,8 @@
     
     dispatch_queue_t decodeQueue;
     dispatch_queue_t delegateQueue;
+
+    OGVPlayerSoundMode soundMode;
 }
 
 #pragma mark - Public methods
@@ -44,8 +46,18 @@
 -(instancetype)initWithURL:(NSURL *)URL
                   delegate:(id<OGVPlayerStateDelegate>)aDelegate
 {
+    return [self initWithURL:URL
+                    delegate:delegate
+                   soundMode:OGVPlayerSoundModePlayback];
+}
+-(instancetype)initWithURL:(NSURL *)URL
+                  delegate:(id<OGVPlayerStateDelegate>)aDelegate
+                 soundMode:(OGVPlayerSoundMode)aSoundMode
+{
     return [self initWithInputStream:[OGVInputStream inputStreamWithURL:URL]
-                            delegate:delegate];
+                            delegate:delegate
+                       delegateQueue:dispatch_get_main_queue()
+                           soundMode:aSoundMode];
 }
 
 -(instancetype)initWithInputStream:(OGVInputStream *)inputStream
@@ -60,6 +72,17 @@
                           delegate:(id<OGVPlayerStateDelegate>)aDelegate
                      delegateQueue:(dispatch_queue_t)aDelegateQueue
 {
+    return [self initWithInputStream:inputStream
+                            delegate:aDelegate
+                       delegateQueue:aDelegateQueue
+                           soundMode:OGVPlayerSoundModePlayback];
+}
+
+-(instancetype)initWithInputStream:(OGVInputStream *)inputStream
+                          delegate:(id<OGVPlayerStateDelegate>)aDelegate
+                     delegateQueue:(dispatch_queue_t)aDelegateQueue
+                         soundMode:(OGVPlayerSoundMode)aSoundMode
+{
     self = [super init];
     if (self) {
         delegate = aDelegate;
@@ -69,6 +92,8 @@
 
         // draw on UI thread
         delegateQueue = aDelegateQueue;
+        
+        soundMode = aSoundMode;
 
         stream = inputStream;
         initTime = 0;
@@ -100,7 +125,7 @@
             playing = YES;
             [self seek:0.0f];
         } else if (decoder.dataReady) {
-            [self startPlayback:decoder.hasAudio ? audioPausePosition : frameEndTimestamp];
+            [self startPlayback:(soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio) ? audioPausePosition : frameEndTimestamp];
         } else {
             playAfterLoad = YES;
         }
@@ -171,7 +196,7 @@
                         // probably at end?
                         frameEndTimestamp = time;
                     }
-                    if (decoder.audioReady) {
+                    if (soundMode >= OGVPlayerSoundModeAuto && decoder.audioReady) {
                         audioPausePosition = decoder.audioTimestamp;
                         offsetTime = audioPausePosition;
                     } else {
@@ -218,7 +243,7 @@
 
 - (float)baseTime
 {
-    if (decoder.hasAudio && audioFeeder) {
+    if (soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio && audioFeeder) {
         return audioFeeder.playbackPosition;
     } else {
         return CACurrentMediaTime();
@@ -283,7 +308,7 @@
 
     [self initPlaybackState:offset];
 
-    if (decoder.hasAudio) {
+    if (soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio) {
         [self startAudio:offset];
     }
 
@@ -309,6 +334,7 @@
     assert(!audioFeeder);
 
     audioFeeder = [[OGVAudioFeeder alloc] initWithFormat:decoder.audioFormat];
+    audioFeeder.shouldChangeAudioSessionCategory = soundMode == OGVPlayerSoundModePlayback;
 
     // Reset to audio clock
     initTime = self.baseTime;
@@ -370,7 +396,7 @@
                 return;
             }
             
-            if ((!decoder.hasAudio || decoder.audioReady) && (!decoder.hasVideo || decoder.frameReady)) {
+            if ((soundMode < OGVPlayerSoundModeAuto || !decoder.hasAudio || decoder.audioReady) && (!decoder.hasVideo || decoder.frameReady)) {
                 // More packets already demuxed, just keep running them.
             } else {
                 // Wait for audio to run out, then close up shop!
@@ -406,7 +432,7 @@
         BOOL readyToDrawFrame = readyToDecodeFrame; // hack hack
         
         
-        if (decoder.hasAudio) {
+        if (soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio) {
             
             if ([audioFeeder isClosed]) {
                 // Switch to raw clock when audio is done.
@@ -566,14 +592,14 @@
 -(BOOL)syncAfterSeek:(float)target exact:(BOOL)exact
 {
     while (YES) {
-        while ((decoder.hasAudio && !decoder.audioReady) || (decoder.hasVideo && !decoder.frameReady)) {
+        while ((soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio && !decoder.audioReady) || (decoder.hasVideo && !decoder.frameReady)) {
             if (![decoder process]) {
                 NSLog(@"Got to end of file before found data again after seek.");
                 return NO;
             }
         }
         if (exact) {
-            if (decoder.hasAudio && decoder.audioReady && decoder.audioTimestamp < target) {
+            if (soundMode >= OGVPlayerSoundModeAuto && decoder.hasAudio && decoder.audioReady && decoder.audioTimestamp < target) {
                 if ([decoder decodeAudio]) {
                     // no-op
                 }
@@ -584,7 +610,7 @@
                 }
             }
             if ((!decoder.hasVideo || decoder.frameTimestamp >= target) &&
-                (!decoder.hasAudio || decoder.audioTimestamp >= target)) {
+                (soundMode < OGVPlayerSoundModeAuto || !decoder.hasAudio || decoder.audioTimestamp >= target)) {
                 return YES;
             }
         } else {
